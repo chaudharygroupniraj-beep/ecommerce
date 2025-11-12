@@ -1,127 +1,149 @@
-// Shopping Cart Functionality
 let cart = [];
+let products = [];
 
-function addToCart(productName, price) {
-    // Check if product already in cart
-    const existingItem = cart.find(item => item.name === productName);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            name: productName,
-            price: price,
-            quantity: 1
-        });
-    }
-    
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
     updateCart();
-    showNotification(`✅ ${productName} added to cart!`);
+});
+
+async function loadProducts() {
+    try {
+        // Try to load from Firebase
+        const snapshot = await db.collection('products').get();
+        products = [];
+        snapshot.forEach(doc => {
+            products.push({ id: doc.id, ...doc.data() });
+        });
+        
+        if (products.length === 0) {
+            loadSampleProducts();
+        } else {
+            displayProducts();
+        }
+    } catch (error) {
+        console.log("Using sample products");
+        loadSampleProducts();
+    }
+}
+
+function loadSampleProducts() {
+    products = [
+        {
+            id: '1',
+            name: "Wireless Headphones",
+            price: 2500,
+            image: "https://via.placeholder.com/300x200/3498db/ffffff?text=Headphones",
+            description: "High-quality wireless headphones"
+        },
+        {
+            id: '2',
+            name: "Smart Watch",
+            price: 4500,
+            image: "https://via.placeholder.com/300x200/e74c3c/ffffff?text=Smart+Watch", 
+            description: "Feature-rich smartwatch"
+        }
+    ];
+    displayProducts();
+}
+
+function displayProducts() {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = products.map(product => `
+        <div class="product-card">
+            <img src="${product.image}" alt="${product.name}" class="product-image">
+            <h3 class="product-name">${product.name}</h3>
+            <p class="product-description">${product.description}</p>
+            <p class="product-price">NPR ${product.price.toLocaleString()}</p>
+            <button class="add-to-cart" onclick="addToCart('${product.id}', '${product.name}', ${product.price})">
+                Add to Cart
+            </button>
+        </div>
+    `).join('');
+}
+
+function addToCart(id, name, price) {
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ id, name, price, quantity: 1 });
+    }
+    updateCart();
+    alert(`✅ ${name} added to cart!`);
 }
 
 function updateCart() {
     const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('totalAmount');
+    const totalAmount = document.getElementById('totalAmount');
     const cartCount = document.getElementById('cartCount');
     
-    // Calculate total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
     
-    // Update cart count
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    cartCount.textContent = itemCount;
+    totalAmount.textContent = total.toLocaleString();
     
-    // Update cart display
     if (cart.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        cartTotal.textContent = '0';
+        cartItems.innerHTML = '<p class="empty-cart">Cart is empty</p>';
         return;
     }
-
+    
     cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <div class="cart-item-info">
-                <h4>${item.name}</h4>
-                <p>NPR ${item.price.toLocaleString()} × ${item.quantity}</p>
-            </div>
-            <div class="cart-item-actions">
-                <button onclick="updateQuantity('${item.name}', -1)" style="background: #dc143c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">−</button>
-                <span style="margin: 0 10px;">${item.quantity}</span>
-                <button onclick="updateQuantity('${item.name}', 1)" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">+</button>
-                <button onclick="removeFromCart('${item.name}')" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 10px;">Remove</button>
-            </div>
+            <div>${item.name} × ${item.quantity}</div>
+            <div>NPR ${(item.price * item.quantity).toLocaleString()}</div>
         </div>
     `).join('');
-    
-    cartTotal.textContent = total.toLocaleString();
-}
-
-function updateQuantity(productName, change) {
-    const item = cart.find(item => item.name === productName);
-    if (item) {
-        item.quantity += change;
-        if (item.quantity <= 0) {
-            removeFromCart(productName);
-        } else {
-            updateCart();
-        }
-    }
-}
-
-function removeFromCart(productName) {
-    cart = cart.filter(item => item.name !== productName);
-    updateCart();
-    showNotification("❌ Item removed from cart");
 }
 
 function checkout() {
     if (cart.length === 0) {
-        showNotification("🛒 Please add items to cart first!");
+        alert("🛒 Please add items to cart first!");
         return;
     }
     
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Create order summary
     const orderDetails = cart.map(item => 
-        `${item.name} (Qty: ${item.quantity}) - NPR ${(item.price * item.quantity).toLocaleString()}`
+        `${item.name} (${item.quantity}) - NPR ${(item.price * item.quantity).toLocaleString()}`
     ).join('%0A');
     
-    // Create WhatsApp message
-    const phoneNumber = "98XXXXXXX"; // Replace with your WhatsApp number
-    const message = `Hello! I want to order:%0A%0A${orderDetails}%0A%0ATotal: NPR ${total.toLocaleString()}%0A%0APlease contact me for delivery details.`;
+    const name = prompt("Your name:");
+    if (!name) return;
     
-    // Open WhatsApp
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    const address = prompt("Delivery address:");
+    if (!address) return;
     
-    showNotification("📱 Opening WhatsApp to confirm your order!");
+    const phone = prompt("Your phone:");
+    if (!phone) return;
+    
+    const message = `🛍️ NEW ORDER%0A%0AName: ${name}%0APhone: ${phone}%0AAddress: ${address}%0A%0AOrder:%0A${orderDetails}%0A%0ATotal: NPR ${total.toLocaleString()}%0A%0APlease confirm.`;
+    
+    window.open(`https://wa.me/9779841234567?text=${message}`, '_blank');
+    
+    // Save order to Firebase
+    saveOrder(name, phone, address, total);
+    
+    cart = [];
+    updateCart();
+    alert("✅ Order placed! We'll contact you soon.");
 }
 
-function showNotification(message) {
-    // Simple notification using alert
-    alert(message);
+async function saveOrder(name, phone, address, total) {
+    try {
+        await db.collection('orders').add({
+            customerName: name,
+            customerPhone: phone,
+            customerAddress: address,
+            items: cart,
+            total: total,
+            timestamp: new Date(),
+            status: 'pending'
+        });
+    } catch (error) {
+        console.log("Order saved locally");
+    }
 }
 
 function scrollToProducts() {
-    document.getElementById('products').scrollIntoView({
-        behavior: 'smooth'
-    });
+    document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
 }
-
-// Initialize cart when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    updateCart();
-});
-
-// Smooth scrolling for navigation
-document.querySelectorAll('nav a').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId.startsWith('#')) {
-            document.querySelector(targetId).scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
-});
