@@ -3,153 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ecommerce - Best Online Store in Nepal</title>
+    <title>Your Store - Best Online Shopping in Nepal</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="logo">
-                <h1>🛍️ ecommerce</h1>
+                <h1>🛍️ Your Store Name</h1>
                 <p>Best Online Shopping in Nepal</p>
             </div>
             <nav class="nav">
                 <a href="#home">Home</a>
                 <a href="#products">Products</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
                 <a href="#cart">Cart (<span id="cartCount">0</span>)</a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h2>Welcome to ecommerce</h2>
-                <p>Quality Products • Fast Delivery • Best Prices in Nepal</p>
-                <button class="cta-button" onclick="scrollToProducts()">Shop Now</button>
+                <h2>Welcome to Your Store</h2>
+                <p>Quality Products • Fast Delivery • Best Prices</p>
+                <button class="cta-button" onclick="scrollToProducts()">Start Shopping</button>
             </div>
         </div>
     </section>
 
-    <!-- Products Section -->
     <section id="products" class="products">
         <div class="container">
             <h2>Our Products</h2>
-            <div class="products-grid">
-                <!-- PRODUCT 1 - Replace with your actual product -->
-                <div class="product-card">
-                    <img src=https://ibb.co/TxF8RmnS https://ibb.co/PGNcx38n" alt="Your Product Name" class="product-image">
-                    <h3 class="product-name">WM 20000</h3>
-                    <p class="product-description">Washing Machine Nepal with good washing ability</p>
-                    <p class="product-price">52011</p>
-                    <button class="add-to-cart" onclick="addToCart('Product 1', 52011)">Add to Cart</button>
-                </div>
-
-                <!-- PRODUCT 2 - Replace with your actual product -->
-                <div class="product-card">
-                    <img src="https://via.placeholder.com/300x200/e74c3c/ffffff?text=PRODUCT+2" alt="Your Product Name" class="product-image">
-                    <h3 class="product-name">Your Product Name 2</h3>
-                    <p class="product-description">Premium quality with warranty.</p>
-                    <p class="product-price">NPR 2,800</p>
-                    <button class="add-to-cart" onclick="addToCart('Product 2', 2800)">Add to Cart</button>
-                </div>
-
-                <!-- PRODUCT 3 - Replace with your actual product -->
-                <div class="product-card">
-                    <img src="https://via.placeholder.com/300x200/2ecc71/ffffff?text=PRODUCT+3" alt="Your Product Name" class="product-image">
-                    <h3 class="product-name">Your Product Name 3</h3>
-                    <p class="product-description">Best value for money in Nepal.</p>
-                    <p class="product-price">NPR 3,200</p>
-                    <button class="add-to-cart" onclick="addToCart('Product 3', 3200)">Add to Cart</button>
-                </div>
-
-                <!-- Add more products as needed -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Products loaded by JavaScript -->
             </div>
         </div>
     </section>
 
-    <!-- Shopping Cart -->
     <section id="cart" class="cart">
         <div class="container">
-            <h2>Your Shopping Cart</h2>
+            <h2>Your Cart</h2>
             <div id="cartItems" class="cart-items">
-                <p class="empty-cart">Your cart is empty</p>
+                <p class="empty-cart">Cart is empty</p>
             </div>
             <div class="cart-total">
                 <h3>Total: NPR <span id="totalAmount">0</span></h3>
-                <button class="checkout-btn" onclick="checkout()">Place Order via WhatsApp</button>
+                <button class="checkout-btn" onclick="checkout()">Order via WhatsApp</button>
             </div>
         </div>
     </section>
 
-    <!-- Payment & Delivery Info -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2>Payment & Delivery Information</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>💰 Payment Methods</h3>
-                    <ul>
-                        <li>✅ Cash on Delivery</li>
-                        <li>✅ eSewa: 9841000000</li>
-                        <li>✅ Khalti: 9841000000</li>
-                    </ul>
-                </div>
-                
-                <div class="info-card">
-                    <h3>🚚 Delivery Areas</h3>
-                    <ul>
-                        <li>📍 Kathmandu: NPR 50-100</li>
-                        <li>📍 Pokhara: NPR 150-300</li>
-                        <li>📍 Other Cities: Contact us</li>
-                        <li>⏰ Same day delivery available</li>
-                    </ul>
-                </div>
-                
-                <div class="info-card">
-                    <h3>📞 Contact Us</h3>
-                    <ul>
-                        <li>📱 WhatsApp: 9841000000</li>
-                        <li>📞 Phone: 9841000000</li>
-                        <li>📧 Email: ecommerce@email.com</li>
-                        <li>📍 Location: Kathmandu, Nepal</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>ecommerce</h3>
-                    <p>Your trusted online shopping destination in Nepal. Quality products with fast delivery.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <a href="#products">Products</a>
-                    <a href="#about">Delivery Info</a>
-                    <a href="#contact">Contact</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Business Info</h4>
-                    <p>📍 Kathmandu, Nepal</p>
-                    <p>📞 +977 9841000000</p>
-                    <p>🕒 9AM-6PM, Sunday-Friday</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 ecommerce. All rights reserved.</p>
-            </div>
+            <p>&copy; 2024 Your Store. All rights reserved.</p>
+            <p>📱 WhatsApp: 98XXXXXXX | 📞 Phone: 98XXXXXXX</p>
         </div>
     </footer>
 
+    <script src="firebase.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
